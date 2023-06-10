@@ -10,8 +10,10 @@ public class IA : MonoBehaviour
     public GameObject target;
     public float speed;
     public float currentHealth;
+    public float damage;
     public float maxHealth;
     public int healthFrasks = 3;
+    public Animator anim;
     public enum State {
         Follow,
         Attack,
@@ -27,6 +29,7 @@ public class IA : MonoBehaviour
         currentState = State.Follow;
         //Es un gameObject que esta detrás del jugador para que cuando no haya enemigos se vaya ahi
         playerPos = GameObject.FindGameObjectWithTag("AllyPosition").transform; 
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -49,6 +52,11 @@ public class IA : MonoBehaviour
         stateText.text = currentState.ToString();
         if (target == null) {
             hasTarget = false;
+            currentState = State.Follow;
+        }
+
+        if (currentHealth <= 0) {
+            Destroy(gameObject);
         }
     }
 
@@ -57,6 +65,7 @@ public class IA : MonoBehaviour
         if (hasTarget) {
             currentState = State.Attack;
         }
+        StopAnim("IsAttacking");
     }
 
     void Attack() {
@@ -68,16 +77,23 @@ public class IA : MonoBehaviour
             Vector3 direction = (target.transform.position - transform.position).normalized;
             transform.position += direction * speed * Time.deltaTime;
             transform.LookAt(target.transform);
+        } else {
+            anim.SetBool("IsAttacking", true);
         }
 
         if (currentHealth <= (maxHealth * 30/100) && healthFrasks >= 1) {
             currentState = State.Flee;
+        }
+
+        if (target.GetComponent<Enemy>().anim.GetBool("IsDead")) {
+            target = GetClosestTarget();
         }
     }
 
     void Hold() {
         //Para que se quede quieto
         //Podria utilizarse en cualquier momento
+        StopAnim("IsAttacking");
         return;
     }
 
@@ -93,6 +109,8 @@ public class IA : MonoBehaviour
         if (distance > 10f) {
             Heal();
         }
+        StopAnim("IsAttacking");
+
     }
 
     void Heal() {
@@ -122,7 +140,7 @@ public class IA : MonoBehaviour
         foreach (GameObject targetGO in GameObject.FindGameObjectsWithTag("Enemy")) {
             float distance = Vector3.Distance(transform.position, targetGO.transform.position);
 
-            if (distance < closestDistance) {
+            if (distance < closestDistance && !targetGO.GetComponent<Enemy>().anim.GetBool("IsDead")) {
                 closestDistance = distance;
                 currentTarget = targetGO;
             }
@@ -130,5 +148,28 @@ public class IA : MonoBehaviour
         }
         Debug.Log(currentTarget);
         return currentTarget;
+    }
+
+     public void StopAnim(string name) {
+        //Para poner en false una animación que me daba pereza escribir esto todo el rato
+        anim.SetBool(name, false);
+    }
+
+    public void DealDamage() {
+        Collider[] hitEnemies = Physics.OverlapSphere(transform.position, 3f);
+
+        foreach (Collider enemy in hitEnemies){
+            if (enemy.gameObject.GetComponent<Enemy>()) {
+                Enemy target = enemy.gameObject.GetComponent<Enemy>();
+                Vector3 enemyDirection = (target.transform.position - transform.position).normalized;
+                float angleToEnemy = Vector3.Angle(transform.forward, enemyDirection);
+
+                float maxAngle = 90f;
+                
+                if (angleToEnemy <= maxAngle) {
+                    target.health -= damage;
+                }
+            }
+        }
     }
 }

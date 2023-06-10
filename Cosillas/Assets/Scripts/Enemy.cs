@@ -92,6 +92,7 @@ public class Enemy : MonoBehaviour
     public void Walking() {
         transform.position = Vector3.MoveTowards(transform.position, target.transform.position, 3f * Time.deltaTime);
         anim.SetBool("IsMoving", true);
+        
 
         if (distance < 1.5f) {
             currentState = State.Attacking;
@@ -124,22 +125,42 @@ public class Enemy : MonoBehaviour
     public void DealDamage() {
         //Lo mismo que en el player la esfera y tal tal tal y evitar que lo haga en 360º
         Collider[] hitTargets = Physics.OverlapSphere(transform.position, 3f);
-        transform.LookAt(target.transform);
+        // transform.LookAt(target.transform);
+        
 
         foreach (Collider targetCollider in hitTargets){
             if (targetCollider.gameObject.GetComponent<Player>()) {
                 Player targetHit = targetCollider.gameObject.GetComponent<Player>();
-                targetHit.health -= damage;
+                if (GetAngleVector(targetHit.transform) <= 90) {
+                    targetHit.health -= damage; 
+                }
             }
             if (targetCollider.gameObject.GetComponent<IA>()) {
                 IA targetHit = targetCollider.gameObject.GetComponent<IA>();
-                targetHit.currentHealth -= damage;
+                if (GetAngleVector(targetHit.transform) <= 90) {
+                    targetHit.currentHealth -= damage;
+                }
             }
         }
     }
 
     public void StopAnim(string name) {
         anim.SetBool(name, false);
+    }
+
+    public float GetAngleVector(Transform target) {
+        Vector3 enemyDirection = (target.position - transform.position).normalized;
+        float angleToEnemy = Vector3.Angle(transform.forward, enemyDirection);
+
+        return angleToEnemy;
+    }
+
+    public void RotateTowardsTarget(Transform targetPosition) {
+        Vector3 directionToEnemy = (target.transform.position - transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(directionToEnemy);
+
+        float rotationSpeed = 5f;
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     public GameObject GetClosestTarget() {

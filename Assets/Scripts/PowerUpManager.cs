@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PowerUpManager : MonoBehaviour
 {
+    //
     public PowerUp[] powerUps;  // Array de Scriptable Objects con los diferentes objetos de power-up
 
     PlayerPowerUp player;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MovementBehaviour
 {
     public float health;
     public float damage;
@@ -92,6 +92,7 @@ public class Enemy : MonoBehaviour
     public void Walking() {
         transform.position = Vector3.MoveTowards(transform.position, target.transform.position, 3f * Time.deltaTime);
         anim.SetBool("IsMoving", true);
+        RotateTowardsTarget(target.transform.position);
         
 
         if (distance < 1.5f) {

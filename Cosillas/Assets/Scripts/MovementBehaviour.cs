@@ -4,15 +4,11 @@ using UnityEngine;
 
 public class MovementBehaviour : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public void RotateTowardsTarget(Vector3 targetPosition) {
+        Vector3 directionToEnemy = (targetPosition - transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(directionToEnemy);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        float rotationSpeed = 5f;
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 }

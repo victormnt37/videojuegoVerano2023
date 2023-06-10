@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewData", menuName = "ScriptableObjects/Data")]
 public class PowerUp : ScriptableObject
 {
-    //
+    
     public GameObject prefab;  // Prefab del power-up
     public int healthModifier;  // Modificador de salud
     public int damageModifier;  // Modificador de daño

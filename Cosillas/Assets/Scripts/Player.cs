@@ -45,13 +45,20 @@ public class Player : MonoBehaviour
 
     public void DealDamage() {
         //Coge los collider del radio de una esfera
-        //Habrá que cambiarlo en un futuro para que solo golpee a los de delante y no en 360º
+        //Solo golpea si esta en un rango menor o igual que 90º 
+        //Se podria cambiar el rango en funcion del arma?¿?¿?¿??¿?¿?¿?¿?¿?¿?¿¿¿?¿?¿?¿¿?¿¿??¿?¿¿¿?¿?¿?¿??¿?¿¿?¿¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿?¿¿?¿?¿?¿?
         Collider[] hitEnemies = Physics.OverlapSphere(transform.position, 3f);
 
         foreach (Collider enemy in hitEnemies){
             if (enemy.gameObject.GetComponent<Enemy>()) {
                 Enemy target = enemy.gameObject.GetComponent<Enemy>();
-                target.health -= damage;
+                Vector3 enemyDirection = (target.transform.position - transform.position).normalized;
+                float angleToEnemy = Vector3.Angle(transform.forward, enemyDirection);
+                float maxAngle = 90f;
+                Debug.Log(angleToEnemy);
+                if (angleToEnemy <= maxAngle) {
+                    target.health -= damage;
+                }
             }
         }
     }

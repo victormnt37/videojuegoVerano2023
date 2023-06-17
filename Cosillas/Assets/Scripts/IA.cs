@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-public class IA : MonoBehaviour
+public class IA : MovementBehaviour
 {
     public bool hasTarget;
     public TMP_Text stateText; 
@@ -21,6 +21,12 @@ public class IA : MonoBehaviour
         Flee
     }
 
+    /*
+    Que tenga un medidor de "cansancio"
+    Que de ese cansancio no pueda caminar o correr si no tiene la energia suficiente
+    Que de vueltas al rededor del enemigo si no tiene la energia suficiente o se eche hacia atrás
+    Obviamente que vaya cambiando de estado según cada cosa
+    */ 
     [SerializeField] State currentState; 
     // Start is called before the first frame update
     void Start()
@@ -62,6 +68,7 @@ public class IA : MonoBehaviour
 
     void Follow() {
         transform.position = Vector3.MoveTowards(transform.position, playerPos.position, speed * Time.deltaTime);
+        RotateTowardsTarget(playerPos.transform.position);
         if (hasTarget) {
             currentState = State.Attack;
         }
@@ -73,6 +80,7 @@ public class IA : MonoBehaviour
             currentState = State.Follow;
         }
         float distance = Vector3.Distance(transform.position, target.transform.position);
+        RotateTowardsTarget(target.transform.position);
         if (distance > 1.5f) {
             Vector3 direction = (target.transform.position - transform.position).normalized;
             transform.position += direction * speed * Time.deltaTime;

@@ -12,6 +12,9 @@ public class Player : MonoBehaviour
     [SerializeField] int healthFrasks = 3;
     public CharacterController player;
     public Animator anim;
+
+    //Que tenga un target para el parry
+    public GameObject playersTarget;
     void Start()
     {
         player = GetComponent<CharacterController>();
@@ -28,6 +31,7 @@ public class Player : MonoBehaviour
         if (playerInput == Vector3.zero) {
             StopAnim("IsMoving");
         }
+        
         player.Move(playerInput * 5f * Time.deltaTime);
 
         if (Input.GetKeyDown(KeyCode.T)) {
@@ -56,6 +60,7 @@ public class Player : MonoBehaviour
                 float angleToEnemy = Vector3.Angle(transform.forward, enemyDirection);
                 float maxAngle = 90f;
                 Debug.Log(angleToEnemy);
+                playersTarget = enemy.gameObject;
                 if (angleToEnemy <= maxAngle) {
                     target.health -= damage;
                 }

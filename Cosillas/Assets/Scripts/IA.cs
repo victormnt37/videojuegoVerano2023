@@ -1,19 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-public class IA : MovementBehaviour
+public class IA : NPC
 {
     public bool hasTarget;
-    public TMP_Text stateText; 
     public Transform playerPos;
-    public GameObject target;
-    public float speed;
-    public float currentHealth;
-    public float damage;
-    public float maxHealth;
     public int healthFrasks = 3;
-    public Animator anim;
     public enum State {
         Follow,
         Attack,
@@ -29,18 +21,19 @@ public class IA : MovementBehaviour
     */ 
     [SerializeField] State currentState; 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        currentHealth = maxHealth;
+        //base.Start() llama al start de la clase NPC es decir el padre
+        base.Start();
         currentState = State.Follow;
         //Es un gameObject que esta detrás del jugador para que cuando no haya enemigos se vaya ahi
         playerPos = GameObject.FindGameObjectWithTag("AllyPosition").transform; 
-        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         switch(currentState) {
             case State.Follow:
                 Follow();
@@ -73,6 +66,7 @@ public class IA : MovementBehaviour
             currentState = State.Attack;
         }
         StopAnim("IsAttacking");
+        RecoverEnergy();
     }
 
     void Attack() {
@@ -93,7 +87,7 @@ public class IA : MovementBehaviour
             currentState = State.Flee;
         }
 
-        if (target.GetComponent<Enemy>().anim.GetBool("IsDead")) {
+        if (target.GetComponent<Enemy>().IsAnimActive("IsDead")) {
             target = GetClosestTarget();
         }
     }
@@ -118,6 +112,7 @@ public class IA : MovementBehaviour
             Heal();
         }
         StopAnim("IsAttacking");
+        RecoverEnergy();
 
     }
 
@@ -148,7 +143,7 @@ public class IA : MovementBehaviour
         foreach (GameObject targetGO in GameObject.FindGameObjectsWithTag("Enemy")) {
             float distance = Vector3.Distance(transform.position, targetGO.transform.position);
 
-            if (distance < closestDistance && !targetGO.GetComponent<Enemy>().anim.GetBool("IsDead")) {
+            if (distance < closestDistance && !targetGO.GetComponent<Enemy>().IsAnimActive("IsDead")) {
                 closestDistance = distance;
                 currentTarget = targetGO;
             }
@@ -157,13 +152,11 @@ public class IA : MovementBehaviour
         Debug.Log(currentTarget);
         return currentTarget;
     }
-
-     public void StopAnim(string name) {
-        //Para poner en false una animación que me daba pereza escribir esto todo el rato
-        anim.SetBool(name, false);
-    }
-
     public void DealDamage() {
+        //Que haga mas daño según la resistencia o que la animación sea más corta? VOTEN!!!
+        float variableDamage = damage * (currentResistance / 100);
+        Debug.Log(variableDamage);
+
         Collider[] hitEnemies = Physics.OverlapSphere(transform.position, 3f);
 
         foreach (Collider enemy in hitEnemies){

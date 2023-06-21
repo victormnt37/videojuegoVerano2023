@@ -1,18 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-
-public class Enemy : MovementBehaviour
+public class Enemy : NPC
 {
     public float health;
-    public float damage;
     public float expToGive;
     public float timer;
-    public GameObject target;
     public GameObject player;
     public float distance;
-    public Animator anim;
     public enum State {
         Idle,
         Patroll,
@@ -22,23 +17,25 @@ public class Enemy : MovementBehaviour
         Die
     }
 
-    public TMP_Text stateText;
-
     public State currentState;
+    public bool isDealingDamage;
 
     //Por si se hacen enemigos a distancia
     [Header("Distance Enemy")]
     public float castingTimer;
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        //base.Start() llama al start de la clase NPC es decir el padre
+        base.Start();
         currentState = State.Idle;
         player = GameObject.Find("Player");
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         if (health <= 0) {
             currentState = State.Die;
         }
@@ -109,6 +106,7 @@ public class Enemy : MovementBehaviour
     public void Attacking() {
         anim.SetBool("IsAttacking", true);
         StopAnim("IsMoving");
+        RotateTowardsTarget(target.transform.position);
         
         if (distance >= 3.5) {
             currentState = State.Walking;
@@ -129,6 +127,7 @@ public class Enemy : MovementBehaviour
         // transform.LookAt(target.transform);
         
 
+        isDealingDamage = true;
         foreach (Collider targetCollider in hitTargets){
             if (targetCollider.gameObject.GetComponent<Player>()) {
                 Player targetHit = targetCollider.gameObject.GetComponent<Player>();
@@ -139,16 +138,15 @@ public class Enemy : MovementBehaviour
             if (targetCollider.gameObject.GetComponent<IA>()) {
                 IA targetHit = targetCollider.gameObject.GetComponent<IA>();
                 if (GetAngleVector(targetHit.transform) <= 90) {
-                    targetHit.currentHealth -= damage;
+                    targetHit.TakeDamage(damage);
                 }
             }
         }
     }
 
-    public void StopAnim(string name) {
-        anim.SetBool(name, false);
+    public void StopDealingDamage() {
+        isDealingDamage = false;
     }
-
     public float GetAngleVector(Transform target) {
         Vector3 enemyDirection = (target.position - transform.position).normalized;
         float angleToEnemy = Vector3.Angle(transform.forward, enemyDirection);

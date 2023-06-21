@@ -28,8 +28,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7748136026633690238}
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000035762784}
-  m_LocalPosition: {x: 0, y: 0, z: 19.25}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -37,7 +37,7 @@ Transform:
   - {fileID: 7785687841672215592}
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7748136026633690226
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -114,18 +114,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c0e0410c78b5b54ba0b85a8833f3373, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 500
+  currentResistance: 0
+  currentHealth: 0
+  maxResistance: 0
+  maxHealth: 0
+  target: {fileID: 0}
+  nearTargets: []
+  stateText: {fileID: 7748136027876348961}
+  anim: {fileID: 7748136026633690228}
   damage: 30
+  speed: 0
+  health: 500
   expToGive: 300
   timer: 0
-  target: {fileID: 0}
   player: {fileID: 0}
   distance: 0
-  anim: {fileID: 7748136026633690228}
-  stateText: {fileID: 7748136027876348961}
   currentState: 0
-  enemiesPrefab:
-  - {fileID: 7748136026633690238}
+  isDealingDamage: 0
+  castingTimer: 0
 --- !u!95 &7748136026633690228
 Animator:
   serializedVersion: 4
